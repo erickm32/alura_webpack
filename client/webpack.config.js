@@ -28,16 +28,11 @@ plugins.push(
     })
 );
 
-plugins.push(new webpack.optimize.CommonsChunkPlugin({
-    name: 'vendor',
-    filename: 'vendor.bundle.js'
-}))
 
 let SERVICE_URL = JSON.stringify('http://localhost:3000');
 
 if (process.env.NODE_ENV == 'production') {
     SERVICE_URL = JSON.stringify('http://endereco-de-producao.com');
-    plugins.push(new webpack.optimize.ModuleConcatenationPlugin());
     plugins.push(new babiliPlugin());
     plugins.push(new optimizeCSSAssetsPlugin({
         cssProcessor: require('cssnano'),
@@ -53,6 +48,7 @@ if (process.env.NODE_ENV == 'production') {
 plugins.push(new webpack.DefinePlugin({ SERVICE_URL }));
 
 module.exports = {
+    mode: "development",
     entry: {
         app: './app-src/app.js',
         vendor: ['jquery', 'bootstrap', 'reflect-metadata']
@@ -94,6 +90,11 @@ module.exports = {
                 loader: 'url-loader?limit=10000&mimetype=image/svg+xml'
             }
         ]
+    },
+    optimization: {
+        splitChunks: {
+            chunks: "all"
+        }
     },
     plugins
 }
