@@ -1,9 +1,25 @@
 const path = require('path');
 const babiliPlugin = require('babili-webpack-plugin');
+const extractTextPlugin = require('extract-text-webpack-plugin');
+const optimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 
 let plugins = [];
-if(process.env.NODE_ENV == 'production') {
+
+plugins.push(
+    new extractTextPlugin("styles.css")
+);
+
+if (process.env.NODE_ENV == 'production') {
     plugins.push(new babiliPlugin());
+    plugins.push(new optimizeCSSAssetsPlugin({
+        cssProcessor: require('cssnano'),
+        cssProcessorOptions: {
+            discardComments: {
+                removeAll: true
+            }
+        },
+        canPrint: true
+    }));
 }
 
 module.exports = {
@@ -24,24 +40,27 @@ module.exports = {
             },
             {
                 test: /\.css$/,
-                loader: 'style-loader!css-loader'
+                use: extractTextPlugin.extract({
+                    fallback: 'style-loader',
+                    use: 'css-loader'
+                })
             },
-            { 
-                test: /\.(woff|woff2)(\?v=\d+\.\d+\.\d+)?$/, 
-                loader: 'url-loader?limit=10000&mimetype=application/font-woff' 
+            {
+                test: /\.(woff|woff2)(\?v=\d+\.\d+\.\d+)?$/,
+                loader: 'url-loader?limit=10000&mimetype=application/font-woff'
             },
-            { 
-                test: /\.ttf(\?v=\d+\.\d+\.\d+)?$/, 
+            {
+                test: /\.ttf(\?v=\d+\.\d+\.\d+)?$/,
                 loader: 'url-loader?limit=10000&mimetype=application/octet-stream'
             },
-            { 
-                test: /\.eot(\?v=\d+\.\d+\.\d+)?$/, 
-                loader: 'file-loader' 
+            {
+                test: /\.eot(\?v=\d+\.\d+\.\d+)?$/,
+                loader: 'file-loader'
             },
-            { 
-                test: /\.svg(\?v=\d+\.\d+\.\d+)?$/, 
-                loader: 'url-loader?limit=10000&mimetype=image/svg+xml' 
-            }            
+            {
+                test: /\.svg(\?v=\d+\.\d+\.\d+)?$/,
+                loader: 'url-loader?limit=10000&mimetype=image/svg+xml'
+            }
         ]
     },
     plugins
