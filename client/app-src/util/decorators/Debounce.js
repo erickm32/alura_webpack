@@ -8,7 +8,9 @@ export function debounce(milissegundos = 500) {
 
         descriptor.value = function(...args) {
 
-            if(event) event.preventDefault();
+            args.forEach(argumento => {
+                if(argumento.preventDefault()) argumento.preventDefault();
+            });
             clearInterval(timer);
             timer = setTimeout(() => metodoOriginal.apply(this, args), milissegundos);
         }
